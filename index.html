@@ -2119,7 +2119,7 @@ async function openPurchaseDetail(id) {
       }
       else if (x === 'date') { const v = await pickDateTime(fresh.ts); if (v) { await changeTs('purchases', id, v); toast('তারিখ বদলানো হয়েছে (ইতিহাসে লেখা থাকল)'); paint(await run(['purchases'], 'readonly', h => h.get('purchases', id))); if (cur === 'buy') show(); } }
       else if (x === 'void') {
-        const why = await promptSheet('কেনাকাটা বাতিল', fresh.status === 'received' ? 'কারণ লিখুন (বাতিল করলে স্টক আবার কমে যাবে)' : 'কারণ লিখুন', '', 'বাতিল করুন');
+        const why = await promptSheet('কেনাকাটা বাতিল', fresh.status === 'received' ? 'বাতিল করলে স্টক কমবে। সরবরাহকারী টাকা ফেরত দিলে ক্যাশ ও খরচ → ক্যাশে টাকা জমা এন্ট্রি দিন। কারণ লিখুন' : 'কারণ লিখুন', '', 'বাতিল করুন');
         if (why !== null) { await voidPurchase(id, why); toast('বাতিল হয়েছে'); paint(await run(['purchases'], 'readonly', h => h.get('purchases', id))); if (cur === 'buy') show(); }
       }
     } catch (er) { toast(errText(er)); }
@@ -2443,7 +2443,7 @@ async function openPaymentDetail(id, onChange) {
       else if (x === 'share') { const c = C.customers.find(z => z.id === p.cust); shareText('জমার রসিদ', C.settings.shopName + '\nজমার রসিদ ' + p.no + '\nক্রেতা: ' + c.name + '\nতারিখ: ' + fmtDT(p.ts) + '\nজমা: ' + money(p.amount)); }
       else if (x === 'fix') { s.close(); openPaymentEditor({ replace: p, onDone: onChange }); }
       else if (x === 'date') { const v = await pickDateTime(p.ts); if (v) { await changeTs('payments', id, v); toast('তারিখ বদলানো হয়েছে'); await paint(); if (onChange) onChange(); } }
-      else if (x === 'void') { const why = await promptSheet('জমা বাতিল', 'কারণ লিখুন', '', 'বাতিল করুন'); if (why !== null) { await voidPayment(id, why); toast('জমা বাতিল হয়েছে, বাকি আবার বেড়েছে'); await paint(); if (onChange) onChange(); else if (['ledger', 'customers', 'dash', 'cash'].includes(cur)) show(); } }
+      else if (x === 'void') { const why = await promptSheet('জমা বাতিল', 'জমা বাতিল করলে ক্রেতার বাকি আবার বাড়বে এবং ক্যাশ হিসাব থেকে এই জমা বাদ যাবে। বাস্তবে টাকা ফেরত দিলে আলাদা করে ক্যাশ ও খরচ → টাকা বের হওয়া এন্ট্রি দিন। কারণ লিখুন', '', 'বাতিল করুন'); if (why !== null) { await voidPayment(id, why); toast('জমা বাতিল হয়েছে, বাকি আবার বেড়েছে'); await paint(); if (onChange) onChange(); else if (['ledger', 'customers', 'dash', 'cash'].includes(cur)) show(); } }
     } catch (er) { toast(errText(er)); }
   });
 }
@@ -2599,7 +2599,7 @@ async function openSaleDetail(id, onChange) {
       else if (x === 'fix') { s.close(); openSaleEditor({ replace: sale, onDone: onChange }); }
       else if (x === 'date') { const v = await pickDateTime(sale.ts); if (v) { await changeTs('sales', id, v); toast('তারিখ বদলানো হয়েছে (ইতিহাসে লেখা থাকল)'); await paint(); if (onChange) onChange(); } }
       else if (x === 'void') {
-        const why = await promptSheet('বিক্রি বাতিল', 'কারণ লিখুন (বাতিল করলে স্টক ফিরবে, বাকি থাকলে ক্রেতার বাকি কমবে)', '', 'বাতিল করুন');
+        const why = await promptSheet('বিক্রি বাতিল', 'বাতিল করলে স্টক ফিরবে এবং ক্রেতার বাকি সমন্বয় হবে। বাস্তবে টাকা ফেরত দিলে আলাদা করে ক্যাশ ও খরচ → টাকা বের হওয়া এন্ট্রি দিন। কারণ লিখুন', '', 'বাতিল করুন');
         if (why !== null) { await voidSale(id, why); toast('বিক্রি বাতিল হয়েছে, স্টক ফিরে এসেছে'); await paint(); if (onChange) onChange(); }
       }
     } catch (er) { toast(errText(er)); }
