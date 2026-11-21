@@ -1851,7 +1851,7 @@ function visibleProducts(mode) {
   const q = PS.q.trim().toLowerCase();
   return C.products.filter(p => {
     if (p.active === false && mode === 'plan') return false;
-    if (q && (p.name + ' ' + p.cat).toLowerCase().indexOf(q) === -1) return false;
+    if (q && (p.name + ' ' + p.cat + ' ' + (p.subcat || '') + ' ' + (p.brand || '')).toLowerCase().indexOf(q) === -1) return false;
     if (mode === 'plan') { if (PS.pri && p.pri !== PS.pri) return false; if (PS.onlySel && !p.on) return false; if (PS.noSell && p.s > 0) return false; }
     else { if (PS.cat && p.cat !== PS.cat) return false; if (PS.lowOnly && !(p.min > 0 && (p.stock || 0) <= p.min)) return false; }
     return true;
@@ -1870,7 +1870,7 @@ function catalogHTML(mode) {
       (mode === 'plan' ? '<b>' + (x.n ? money(r2(x.s)) : '') + '</b><i style="font-style:normal">' + fmt(x.n) + '/' + fmt(all.length) + ' সিলেক্টেড</i>' : '<i style="font-style:normal">' + fmt(all.length) + 'টি পণ্য</i>') + '</span></summary>';
     if (c.note) h += '<p class="banner ok" style="margin:0 0 8px">' + esc(c.note) + '</p>';
     h += '<div class="row" style="margin-bottom:6px">' + (mode === 'plan' ? '<button type="button" class="btn sm" data-a="catall" data-cat="' + esc(c.name) + '">সব সিলেক্ট</button><button type="button" class="btn sm" data-a="catnone" data-cat="' + esc(c.name) + '">সব বাদ</button>' : '') + '<button type="button" class="btn sm" data-a="catadd" data-cat="' + esc(c.name) + '">+ নতুন পণ্য</button></div>';
-    h += its.length ? its.map(p => pRowHTML(p, mode)).join('') : '<div class="empty small">এই ক্যাটাগরিতে কোনো পণ্য নেই।</div>';
+    h += its.length ? (() => { const groups = {}; its.forEach(p => { const k = p.subcat || 'অন্যান্য'; (groups[k] = groups[k] || []).push(p); }); return Object.keys(groups).map(k => '<details class="subcat" open style="margin:6px 0 8px 10px;padding:7px;border-left:2px solid var(--line)"><summary style="font-weight:600;cursor:pointer;padding:4px">' + esc(k) + ' <span class="muted">(' + fmt(groups[k].length) + ')</span></summary>' + groups[k].map(p => pRowHTML(p, mode)).join('') + '</details>').join(''); })() : '<div class="empty small">এই ক্যাটাগরিতে কোনো পণ্য নেই।</div>';
     h += '</details>';
   });
   if (!h) h = '<div class="empty">কোনো আইটেম পাওয়া যায়নি।</div>';
