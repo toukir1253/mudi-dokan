@@ -1068,9 +1068,14 @@ async function saveSale(d) { // {rid,type,cust,lines,paid,ts,note,replaces}
     for (const l of lines) {
       const p = await h.get('products', l.pid);
       if (!p) throw new Error('পণ্য পাওয়া যায়নি: ' + l.name);
+      const saleQty = num(l.qty);
+      if (!(saleQty > 0)) throw new Error('"' + l.name + '" এর বিক্রির পরিমাণ সঠিক নয়');
+      if ((p.stock || 0) + 0.0005 < saleQty) {
+        throw new Error('"' + l.name + '" পর্যাপ্ত স্টক নেই। বর্তমান স্টক: ' + fmt(p.stock || 0) + ', বিক্রির পরিমাণ: ' + fmt(saleQty));
+      }
       const cost = p.avg >= 0 && p.avg > 0 ? p.avg : (p.b || 0);
-      outLines.push(Object.assign({}, l, { cost: r3(cost) }));
-      await addMove(h, l.pid, -l.qty, 'sale', id, ts, no);
+      outLines.push(Object.assign({}, l, { qty: saleQty, cost: r3(cost) }));
+      await addMove(h, l.pid, -saleQty, 'sale', id, ts, no);
     }
     const sale = { id, rid: d.rid, no, ts, created: Date.now(), type: d.type, cust: d.cust || '', lines: outLines, total, paid, due: r2(total - paid), note: d.note || '', status: 'active', hist: [], replaces: d.replaces || '' };
     if (d.replaces) { sale.hist.push({ ts: Date.now(), act: 'সংশোধিত', info: 'আগের রসিদ ' + oldNo }); const o = await h.get('sales', d.replaces); o.replacedBy = id; await h.put('sales', o); }
