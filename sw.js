@@ -1,5 +1,5 @@
 /* অফলাইন সার্ভিস ওয়ার্কার: প্রথমবার ইন্টারনেটে খুললে অ্যাপ ফোনে জমা হয়, এরপর ইন্টারনেট ছাড়াই খোলে */
-const CACHE = 'mudi-dokan-v3';
+const CACHE = 'mudi-dokan-v4';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {
