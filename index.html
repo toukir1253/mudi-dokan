@@ -1320,7 +1320,7 @@ async function restoreData(backup, label) {
     }
   }
   await takeSnapshot(label || 'পুনরুদ্ধারের আগের অবস্থা');
-  await run(names.concat(['audit']), 'readwrite', async h => {
+  await run(names, 'readwrite', async h => {
     for (const n of names) { await h.clear(n); for (const o of backup.data[n]) await h.put(n, o); }
     await audit(h, 'ব্যাকআপ থেকে পুনরুদ্ধার', '', fmtDT(backup.exportedAt));
   });
