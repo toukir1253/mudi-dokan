@@ -866,7 +866,30 @@ async function nextSeq(h, name) {
 }
 const padNo = (pre, n) => pre + '-' + String(n).padStart(4, '0');
 
+
+/* নতুন বিস্তারিত পণ্য ক্যাটালগ: পুরোনো পণ্য ও লেনদেন অক্ষত রেখে একবার যোগ */
+const CATALOG_EXPANSION = [["পানি","বোতলজাত পানি","ফ্রেশ","ফ্রেশ পানি ৫০০ মিলি","পিস"],["পানি","বোতলজাত পানি","ফ্রেশ","ফ্রেশ পানি ১ লিটার","পিস"],["পানি","বোতলজাত পানি","ফ্রেশ","ফ্রেশ পানি ২ লিটার","পিস"],["পানি","বোতলজাত পানি","মাম","মাম পানি ৫০০ মিলি","পিস"],["পানি","বোতলজাত পানি","মাম","মাম পানি ১ লিটার","পিস"],["পানি","বোতলজাত পানি","বসুন্ধরা","বসুন্ধরা পানি ৫০০ মিলি","পিস"],["পানি","বোতলজাত পানি","বসুন্ধরা","বসুন্ধরা পানি ১ লিটার","পিস"],["পানি","বোতলজাত পানি","আকিজ","আকিজ পানি ৫০০ মিলি","পিস"],["পানি","বোতলজাত পানি","মুসলিম","মুসলিম পানি ৫০০ মিলি","পিস"],["পানি","বোতলজাত পানি","জীবন","জীবন পানি ৫০০ মিলি","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","মোজো","মোজো ২৫০ মিলি ক্যান","ক্যান"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","মোজো","মোজো ২৫০ মিলি বোতল","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","মোজো","মোজো ৫০০ মিলি","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","মোজো","মোজো ১ লিটার","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","কোকা-কোলা","কোকা-কোলা ২৫০ মিলি ক্যান","ক্যান"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","কোকা-কোলা","কোকা-কোলা ২৫০ মিলি বোতল","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","কোকা-কোলা","কোকা-কোলা ৫০০ মিলি","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","কোকা-কোলা","কোকা-কোলা ১ লিটার","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","স্প্রাইট","স্প্রাইট ২৫০ মিলি ক্যান","ক্যান"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","স্প্রাইট","স্প্রাইট ৫০০ মিলি","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","স্প্রাইট","স্প্রাইট ১ লিটার","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","ফান্টা","ফান্টা ২৫০ মিলি","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","ফান্টা","ফান্টা ৫০০ মিলি","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","ফান্টা","ফান্টা ১ লিটার","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","আরসি","আরসি কোলা ২৫০ মিলি","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","আরসি","আরসি কোলা ৫০০ মিলি","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","ফিজ","ফিজ ২৫০ মিলি","পিস"],["কোল্ড ড্রিংকস","কার্বনেটেড ড্রিংকস","ফিজ","ফিজ ৫০০ মিলি","পিস"],["কোল্ড ড্রিংকস","এনার্জি ড্রিংকস","টাইগার","টাইগার ২৫০ মিলি ক্যান","ক্যান"],["কোল্ড ড্রিংকস","এনার্জি ড্রিংকস","টাইগার","টাইগার ২৫০ মিলি বোতল","পিস"],["কোল্ড ড্রিংকস","এনার্জি ড্রিংকস","স্পিড","স্পিড ২৫০ মিলি ক্যান","ক্যান"],["কোল্ড ড্রিংকস","এনার্জি ড্রিংকস","স্পিড","স্পিড ২৫০ মিলি বোতল","পিস"],["কোল্ড ড্রিংকস","এনার্জি ড্রিংকস","রয়্যাল টাইগার","রয়্যাল টাইগার ২৫০ মিলি","পিস"],["কোল্ড ড্রিংকস","ফল ও অন্যান্য পানীয়","প্রাণ","প্রাণ ম্যাঙ্গো জুস ২০০ মিলি","পিস"],["কোল্ড ড্রিংকস","ফল ও অন্যান্য পানীয়","ফ্রুটিকা","ফ্রুটিকা ২৫০ মিলি","পিস"],["কোল্ড ড্রিংকস","ফল ও অন্যান্য পানীয়","ফ্রুটো","ফ্রুটো ২০০ মিলি","পিস"],["কোল্ড ড্রিংকস","ফল ও অন্যান্য পানীয়","ট্যাং","ট্যাং স্যাশে","পিস"],["কোল্ড ড্রিংকস","ফল ও অন্যান্য পানীয়","রুহ আফজা","রুহ আফজা সিরাপ ৭৫০ মিলি","বোতল"],["চিপস ও স্ন্যাকস","আলুর চিপস","প্রাণ","প্রাণ পটেটো ক্র্যাকারস","প্যাকেট"],["চিপস ও স্ন্যাকস","আলুর চিপস","মিস্টার টুইস্ট","মিস্টার টুইস্ট","প্যাকেট"],["চিপস ও স্ন্যাকস","আলুর চিপস","কোকোলা","কোকোলা পটেটো চিপস","প্যাকেট"],["চিপস ও স্ন্যাকস","আলুর চিপস","ড্যানিশ","ড্যানিশ পটেটো চিপস","প্যাকেট"],["চিপস ও স্ন্যাকস","আলুর চিপস","বোম্বে","বোম্বে চিপস","প্যাকেট"],["চিপস ও স্ন্যাকস","আলুর চিপস","লেইজ","লেইজ চিপস","প্যাকেট"],["চিপস ও স্ন্যাকস","স্ন্যাকস","জিরোস","জিরোস","প্যাকেট"],["চিপস ও স্ন্যাকস","স্ন্যাকস","প্রাণ","প্রাণ ঝাল চানাচুর","প্যাকেট"],["চিপস ও স্ন্যাকস","স্ন্যাকস","প্রাণ","প্রাণ চাটপটি","প্যাকেট"],["চিপস ও স্ন্যাকস","স্ন্যাকস","ডেকো","ডেকো চানাচুর","প্যাকেট"],["চিপস ও স্ন্যাকস","স্ন্যাকস","অলটাইম","অলটাইম চানাচুর","প্যাকেট"],["চিপস ও স্ন্যাকস","স্ন্যাকস","কুরকুরে","কুরকুরে","প্যাকেট"],["চিপস ও স্ন্যাকস","স্ন্যাকস","চিজ বল","চিজ বল","প্যাকেট"],["চিপস ও স্ন্যাকস","স্ন্যাকস","পপকর্ন","পপকর্ন","প্যাকেট"],["বিস্কুট ও বেকারি","ক্রিম বিস্কুট","অলটাইম","অলটাইম ক্রিম বিস্কুট","প্যাকেট"],["বিস্কুট ও বেকারি","ক্র্যাকার বিস্কুট","বেঙ্গল","বেঙ্গল ক্র্যাকার","প্যাকেট"],["বিস্কুট ও বেকারি","বিস্কুট","বনফুল","বনফুল বিস্কুট","প্যাকেট"],["বিস্কুট ও বেকারি","বিস্কুট","প্রাণ","প্রাণ বাটার কুকিজ","প্যাকেট"],["বিস্কুট ও বেকারি","বিস্কুট","ড্যানিশ","ড্যানিশ বিস্কুট","প্যাকেট"],["বিস্কুট ও বেকারি","কেক","প্রাণ","প্রাণ কেক","পিস"],["বিস্কুট ও বেকারি","কেক","মিস্টার বেকার","মিস্টার বেকার কেক","পিস"],["চকলেট ও ক্যান্ডি","চকলেট","ক্যাডবেরি","ডেইরি মিল্ক","পিস"],["চকলেট ও ক্যান্ডি","চকলেট","কিটক্যাট","কিটক্যাট","পিস"],["চকলেট ও ক্যান্ডি","চকলেট","প্রাণ","প্রাণ চকলেট","পিস"],["চকলেট ও ক্যান্ডি","ক্যান্ডি","ললিপপ","ললিপপ","পিস"],["চকলেট ও ক্যান্ডি","ক্যান্ডি","এলো","এলো ক্যান্ডি","পিস"],["চকলেট ও ক্যান্ডি","ক্যান্ডি","টফি","টফি","পিস"],["প্লাস্টিক সামগ্রী","প্লাস্টিকের বোতল ও জার","লোকাল","প্লাস্টিক বোতল ৫০০ মিলি","পিস"],["প্লাস্টিক সামগ্রী","প্লাস্টিকের বোতল ও জার","লোকাল","প্লাস্টিক বোতল ১ লিটার","পিস"],["প্লাস্টিক সামগ্রী","প্লাস্টিকের বোতল ও জার","লোকাল","প্লাস্টিক জার","পিস"],["প্লাস্টিক সামগ্রী","বালতি ও মগ","লোকাল","প্লাস্টিক বালতি ছোট","পিস"],["প্লাস্টিক সামগ্রী","বালতি ও মগ","লোকাল","প্লাস্টিক বালতি বড়","পিস"],["প্লাস্টিক সামগ্রী","বালতি ও মগ","লোকাল","প্লাস্টিক মগ","পিস"],["প্লাস্টিক সামগ্রী","বাসন ও প্লেট","লোকাল","প্লাস্টিক প্লেট","পিস"],["প্লাস্টিক সামগ্রী","বাসন ও প্লেট","লোকাল","প্লাস্টিক বাটি","পিস"],["প্লাস্টিক সামগ্রী","বাসন ও প্লেট","লোকাল","প্লাস্টিক গ্লাস","পিস"],["প্লাস্টিক সামগ্রী","ঘরোয়া সামগ্রী","লোকাল","প্লাস্টিক ঝুড়ি","পিস"],["প্লাস্টিক সামগ্রী","ঘরোয়া সামগ্রী","লোকাল","প্লাস্টিক চালুনি","পিস"],["প্লাস্টিক সামগ্রী","ঘরোয়া সামগ্রী","লোকাল","প্লাস্টিক হ্যাঙ্গার","পিস"],["প্লাস্টিক সামগ্রী","ঘরোয়া সামগ্রী","লোকাল","প্লাস্টিক টুল","পিস"],["প্লাস্টিক সামগ্রী","ঘরোয়া সামগ্রী","লোকাল","প্লাস্টিক ড্রাম","পিস"],["চা ও কফি","চা পাতা","ইস্পাহানি","ইস্পাহানি মির্জাপুর চা ২০০ গ্রাম","প্যাকেট"],["চা ও কফি","চা পাতা","ফিনলে","ফিনলে চা ২০০ গ্রাম","প্যাকেট"],["চা ও কফি","চা পাতা","কাজী","কাজী অ্যান্ড কাজী চা","প্যাকেট"],["চা ও কফি","কফি","নেসক্যাফে","নেসক্যাফে কফি","জার"],["চা ও কফি","কফি","ম্যাককফি","ম্যাককফি","প্যাকেট"],["নিত্যপ্রয়োজনীয়","টিস্যু","বসুন্ধরা","বসুন্ধরা টিস্যু","প্যাকেট"],["নিত্যপ্রয়োজনীয়","টিস্যু","ফ্রেশ","ফ্রেশ টিস্যু","বক্স"],["নিত্যপ্রয়োজনীয়","টিস্যু","সেনোরা","সেনোরা ন্যাপকিন","প্যাকেট"]];
+async function ensureCatalogExpansion() {
+  const existing = new Set(C.products.map(p => p.cat + '||' + p.name));
+  const oldCats = new Set(C.cats.map(c => c.name)); const add = [];
+  CATALOG_EXPANSION.forEach((x, i) => { const [cat,subcat,brand,name,unit]=x; if(existing.has(cat+'||'+name)) return;
+    const p=newProduct({id:'catalogv2_'+i,name,cat,unit,q:1,b:0,s:0,pri:2,on:false,d:0,ord:50000+i});
+    p.subcat=subcat; p.brand=brand; p.image=''; add.push(p); existing.add(cat+'||'+name);
+  });
+  const newCats=['পানি','কোল্ড ড্রিংকস','চিপস ও স্ন্যাকস','বিস্কুট ও বেকারি','চকলেট ও ক্যান্ডি','প্লাস্টিক সামগ্রী','চা ও কফি','নিত্যপ্রয়োজনীয়'];
+  const missing=newCats.filter(n=>!oldCats.has(n)); if(!add.length&&!missing.length)return;
+  missing.forEach(name=>C.cats.push({name,note:''}));
+  await run(['products','meta','audit'],'readwrite',async h=>{for(const p of add)await h.put('products',p);await h.put('meta',{k:'cats',v:C.cats});await audit(h,'নতুন পণ্য ক্যাটালগ যোগ','',add.length+'টি প্রাথমিক পণ্য যোগ হয়েছে; পুরোনো ডেটা অক্ষত');await bump(h);});
+}
+
 /* ---------- পণ্য ---------- */
+function readProductImage(file) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type || !file.type.startsWith('image/')) return reject(new Error('ছবির ফাইল নির্বাচন করুন।'));
+    if (file.size > 1200000) return reject(new Error('ছবির সাইজ ১.২ MB-এর মধ্যে রাখুন।'));
+    const reader = new FileReader(); reader.onload = () => resolve(String(reader.result || '')); reader.onerror = () => reject(new Error('ছবি পড়া যায়নি।')); reader.readAsDataURL(file);
+  });
+}
 function defaultAlt(unit) {
   const u = String(unit || '').trim();
   if (u === 'ডজন') return { u: 'পিস', per: 12 };
@@ -881,6 +904,7 @@ function newProduct(o) {
     id: o.id || 'p' + uid().replace(/-/g, '').slice(0, 12), name: o.name, cat: o.cat || 'অন্যান্য', unit: unit,
     q: o.q > 0 ? o.q : 1, b: b, avg: o.avg >= 0 ? o.avg : b, s: o.s > 0 ? o.s : 0, pri: o.pri || 2, on: !!o.on, d: o.d || 0,
     stock: 0, min: o.min >= 0 ? o.min : 0, exp: o.exp || '', alt: o.alt === undefined ? defaultAlt(unit) : o.alt,
+    subcat: o.subcat || '', brand: o.brand || '', image: o.image || '',
     active: true, ord: o.ord != null ? o.ord : Date.now(), created: Date.now()
   };
 }
@@ -1774,7 +1798,9 @@ function pLineHTML(p, mode) {
   const ex = expiryState(p);
   const meta = (mode === 'plan' ? fmt(p.q) + ' ' + esc(p.unit) + ' · ' : '') + 'কেনা ' + money(p.b) + '/' + esc(p.unit) + profitBits(p) + ' · <span>' + PRI[p.pri] + '</span>' + ' · স্টক ' + esc(stockText(p)) +
     (ex && ex.t ? ' <span class="tag ' + ex.cls + '">' + ex.t + '</span>' : '') + (p.min > 0 && (p.stock || 0) <= p.min ? ' <span class="tag red">স্টক কম</span>' : '') + (p.active === false ? ' <span class="tag">লুকানো</span>' : '');
-  const name = '<span class="nm">' + esc(p.name) + '</span><span class="meta">' + meta + '</span>';
+  const thumb = p.image ? '<img src="' + p.image + '" alt="" style="width:42px;height:42px;object-fit:cover;border-radius:7px;vertical-align:middle;margin-right:7px">' : '';
+  const details = [p.brand, p.subcat].filter(Boolean).map(esc).join(' · ');
+  const name = thumb + '<span class="nm">' + esc(p.name) + '</span>' + (details ? '<span class="meta">' + details + '</span>' : '') + '<span class="meta">' + meta + '</span>';
   const left = mode === 'plan' ? '<label class="pick"><input type="checkbox" data-a="tog"' + (p.on ? ' checked' : '') + '><span>' + name + '</span></label>' : '<div>' + name + '</div>';
   const right = '<div class="rt">' + (mode === 'plan' ? '<b>' + money(r2(p.q * p.b)) + '</b>' : '<b>' + esc(fmt(p.stock || 0)) + ' ' + esc(p.unit) + '</b>') + '<button type="button" class="btn sm" data-a="edit">' + (PS.editing.has(p.id) ? 'বন্ধ' : 'সম্পাদনা') + '</button></div>';
   return '<div class="pline">' + left + right + '</div>';
@@ -1784,6 +1810,10 @@ function pPanelHTML(p) {
   const ds = p.d ? '<div class="small muted full">দাম শেষ বদলেছে: ' + fmtD(p.d) + '</div>' : '';
   return '<div class="panel"><div class="form">' +
     '<label class="f full">নাম<input data-f="name" type="text" value="' + esc(p.name) + '"></label>' +
+    '<label class="f full">সাব-ক্যাটাগরি<input data-f="subcat" type="text" value="' + esc(p.subcat || '') + '"></label>' +
+    '<label class="f full">ব্র্যান্ড<input data-f="brand" type="text" value="' + esc(p.brand || '') + '"></label>' +
+    '<label class="f full">পণ্যের ছবি<input data-f="image" type="file" accept="image/*"></label>' +
+    (p.image ? '<div class="full"><img src="' + p.image + '" alt="পণ্যের ছবি" style="width:76px;height:76px;object-fit:cover;border-radius:8px"></div>' : '') +
     '<label class="f full">ক্যাটাগরি<select data-f="cat">' + catOptions(p.cat) + '</select></label>' +
     '<label class="f">কেনার পরিমাণ (পরিকল্পনা)<input data-f="q" type="text" inputmode="decimal" value="' + plain(p.q) + '"></label>' +
     '<label class="f">একক<input data-f="unit" type="text" list="units" value="' + esc(p.unit) + '"></label>' +
@@ -1821,7 +1851,7 @@ function visibleProducts(mode) {
   const q = PS.q.trim().toLowerCase();
   return C.products.filter(p => {
     if (p.active === false && mode === 'plan') return false;
-    if (q && (p.name + ' ' + p.cat).toLowerCase().indexOf(q) === -1) return false;
+    if (q && (p.name + ' ' + p.cat + ' ' + (p.subcat || '') + ' ' + (p.brand || '')).toLowerCase().indexOf(q) === -1) return false;
     if (mode === 'plan') { if (PS.pri && p.pri !== PS.pri) return false; if (PS.onlySel && !p.on) return false; if (PS.noSell && p.s > 0) return false; }
     else { if (PS.cat && p.cat !== PS.cat) return false; if (PS.lowOnly && !(p.min > 0 && (p.stock || 0) <= p.min)) return false; }
     return true;
@@ -1840,7 +1870,7 @@ function catalogHTML(mode) {
       (mode === 'plan' ? '<b>' + (x.n ? money(r2(x.s)) : '') + '</b><i style="font-style:normal">' + fmt(x.n) + '/' + fmt(all.length) + ' সিলেক্টেড</i>' : '<i style="font-style:normal">' + fmt(all.length) + 'টি পণ্য</i>') + '</span></summary>';
     if (c.note) h += '<p class="banner ok" style="margin:0 0 8px">' + esc(c.note) + '</p>';
     h += '<div class="row" style="margin-bottom:6px">' + (mode === 'plan' ? '<button type="button" class="btn sm" data-a="catall" data-cat="' + esc(c.name) + '">সব সিলেক্ট</button><button type="button" class="btn sm" data-a="catnone" data-cat="' + esc(c.name) + '">সব বাদ</button>' : '') + '<button type="button" class="btn sm" data-a="catadd" data-cat="' + esc(c.name) + '">+ নতুন পণ্য</button></div>';
-    h += its.length ? its.map(p => pRowHTML(p, mode)).join('') : '<div class="empty small">এই ক্যাটাগরিতে কোনো পণ্য নেই।</div>';
+    h += its.length ? (() => { const groups = {}; its.forEach(p => { const k = p.subcat || 'অন্যান্য'; (groups[k] = groups[k] || []).push(p); }); return Object.keys(groups).map(k => '<details class="subcat" open style="margin:6px 0 8px 10px;padding:7px;border-left:2px solid var(--line)"><summary style="font-weight:600;cursor:pointer;padding:4px">' + esc(k) + ' <span class="muted">(' + fmt(groups[k].length) + ')</span></summary>' + groups[k].map(p => pRowHTML(p, mode)).join('') + '</details>').join(''); })() : '<div class="empty small">এই ক্যাটাগরিতে কোনো পণ্য নেই।</div>';
     h += '</details>';
   });
   if (!h) h = '<div class="empty">কোনো আইটেম পাওয়া যায়নি।</div>';
@@ -1850,7 +1880,10 @@ function addProductFormHTML() {
   return '<details class="card" id="addbox"><summary style="font-weight:600;cursor:pointer;min-height:30px">+ নতুন পণ্য যোগ করুন</summary><form id="addform" class="form" style="margin-top:10px" autocomplete="off">' +
     '<label class="f full">ক্যাটাগরি<select id="np-cat">' + catOptions('') + '<option value="__new">+ নতুন ক্যাটাগরি…</option></select></label>' +
     '<label class="f full" id="np-newwrap" hidden>নতুন ক্যাটাগরির নাম<input id="np-newcat" type="text"></label>' +
-    '<label class="f full">পণ্যের নাম<input id="np-name" type="text" placeholder="যেমন: রূপচাঁদা তেল"></label>' +
+    '<label class="f full">সাব-ক্যাটাগরি<input id="np-subcat" type="text" placeholder="যেমন: বোতলজাত পানি"></label>' +
+    '<label class="f full">ব্র্যান্ড<input id="np-brand" type="text" placeholder="যেমন: মাম, ফ্রেশ, মোজো"></label>' +
+    '<label class="f full">পণ্যের নাম<input id="np-name" type="text" placeholder="যেমন: ফ্রেশ পানি ১ লিটার"></label>' +
+    '<label class="f full">পণ্যের ছবি (ঐচ্ছিক)<input id="np-image" type="file" accept="image/*"></label>' +
     '<label class="f">কেনার পরিমাণ<input id="np-q" type="text" inputmode="decimal" value="1"></label>' +
     '<label class="f">একক<input id="np-u" type="text" list="units" value="পিস"></label>' +
     '<label class="f">কেনা দাম (প্রতি একক ৳)<input id="np-b" type="text" inputmode="decimal"></label>' +
@@ -1869,6 +1902,7 @@ async function addProductSubmit() {
   if (!(q > 0)) return err('পরিমাণ ০ এর বেশি হতে হবে।'); if (!(b >= 0)) return err('কেনা দাম লিখুন।');
   if (C.products.some(p => p.cat === cat && p.name === name)) return err('এই ক্যাটাগরিতে এই নামে পণ্য আগেই আছে।');
   const p = newProduct({ name, cat, q, unit: $('#np-u').value.trim() || 'পিস', b, s: s > 0 ? s : 0, pri: +$('#np-p').value, on: $('#np-on').checked, d: Date.now() });
+  p.subcat = $('#np-subcat').value.trim(); p.brand = $('#np-brand').value.trim(); p.image = window.__newProductImage || ''; window.__newProductImage = '';
   await run(['products', 'meta', 'audit'], 'readwrite', async h => { await h.put('products', p); await audit(h, 'নতুন পণ্য', p.id, p.name); await bump(h); });
   if (!C.cats.some(c => c.name === cat)) { C.cats.push({ name: cat, note: '' }); await saveCats(); }
   if (st > 0) await adjustStock({ pid: p.id, newStock: st, reason: 'শুরুর স্টক', opening: true });
@@ -1878,6 +1912,8 @@ async function addProductSubmit() {
 async function commitField(t, mode) {
   const row = t.closest('.prow'); const p = byPid(row.dataset.id); const f = t.dataset.f; let recat = false;
   if (f === 'name') { const v = t.value.trim(); if (v) p.name = v; t.value = p.name; }
+  else if (f === 'subcat') p.subcat = t.value.trim();
+  else if (f === 'brand') p.brand = t.value.trim();
   else if (f === 'cat') { p.cat = t.value; recat = true; }
   else if (f === 'unit') { const v = t.value.trim(); if (v) { p.unit = v; if (!p.alt) p.alt = defaultAlt(v); } t.value = p.unit; recat = true; }
   else if (f === 'pri') p.pri = +t.value;
@@ -1921,6 +1957,8 @@ function bindCatalog(mode, refreshTotals, rerender) {
   VH.change = async e => {
     const t = e.target;
     if (t.matches('input[data-a="tog"]')) { const row = t.closest('.prow'), p = byPid(row.dataset.id); p.on = t.checked; await putProduct(p); row.classList.toggle('on', p.on); refreshTotals(); return; }
+    if (t.id === 'np-image' && t.files && t.files[0]) { window.__newProductImage = await readProductImage(t.files[0]); return; }
+    if (t.dataset && t.dataset.f === 'image' && t.files && t.files[0]) { const row=t.closest('.prow'), p=byPid(row.dataset.id); p.image=await readProductImage(t.files[0]); await putProduct(p); rerender(); return; }
     if (t.dataset && t.dataset.f) { const r = await commitField(t, mode); if (r === 'full') rerender(); else { paintRow(r, mode); refreshTotals(); } return; }
     if (t.id === 'np-cat') $('#np-newwrap').hidden = t.value !== '__new';
   };
@@ -2902,7 +2940,7 @@ async function boot() {
   let first = null;
   try { first = await firstRun(); } catch (e) { console.error(e); $('#view').innerHTML = '<div class="banner err">প্রথমবার চালু করতে সমস্যা: ' + esc(errText(e)) + '</div>'; return; }
   if (first && first.info) window.__firstInfo = first.info;
-  await loadCache(); applyTheme();
+  await loadCache(); await ensureCatalogExpansion(); await loadCache(); applyTheme();
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { }
   bindView();
   if (!location.hash) location.replace('#/dash');
