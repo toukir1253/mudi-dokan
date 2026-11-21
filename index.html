@@ -731,7 +731,7 @@ const TZ = 'Asia/Dhaka';
 const PRI = { 1: 'জরুরি', 2: 'নিয়মিত', 3: 'ঐচ্ছিক' };
 const DEF_UNITS = ['কেজি', 'গ্রাম', 'লিটার', 'মি.লি.', 'পিস', 'প্যাকেট', 'বোতল', 'ডজন', 'জোড়া', 'বক্স', 'জার', 'টিন', 'বান্ডিল', 'রিম', 'আঁটি', 'সেট', 'কার্টন', 'দফা', 'ছড়া', 'কৌটা', 'পাতা', 'গোছা', 'রোল', 'স্ট্রিপ', 'হালি'];
 const KEY_OLD2 = 'mudi-dokan-v2', KEY_OLD1 = 'mudi-dokan-talika-v1';
-const APP_ID = 'mudi-pos', APP_VER = 1;
+const APP_ID = 'mudi-pos', APP_VER = 2;
 const DEFAULT_SETTINGS = {
   shopName: 'আমার মুদি দোকান', shopPhone: '', shopAddress: '', receiptFooter: 'ধন্যবাদ, আবার আসবেন',
   budget: 100000, margin: 10, openingCash: 0, lowStockDefault: 5, expiryDays: 30, backupRemindDays: 7, theme: 'auto'
@@ -1173,7 +1173,17 @@ async function voidPurchaseTx(h, id, reason, replaced) {
   if (!pur) throw new Error('কেনাকাটা পাওয়া যায়নি');
   if (pur.status === 'void') throw new Error('আগেই বাতিল হয়েছে');
   const now = Date.now();
-  if (pur.status === 'received') for (const l of pur.lines) await addMove(h, l.pid, -l.qty, 'void-buy', pur.id, now, 'কেনা বাতিল ' + pur.no);
+  if (pur.status === 'received') {
+    const remaining = new Map();
+    for (const l of pur.lines) {
+      const p = await h.get('products', l.pid);
+      if (!p) throw new Error('পণ্য পাওয়া যায়নি: ' + l.name);
+      const available = remaining.has(l.pid) ? remaining.get(l.pid) : (p.stock || 0);
+      if (available + 0.0005 < l.qty) throw new Error('"' + l.name + '" এর কেনা পরিমাণের সবটা এখন স্টকে নেই। বিক্রি/ব্যবহার হওয়া পরিমাণ আগে সমন্বয় না করে এই কেনাকাটা বাতিল করা যাবে না।');
+      remaining.set(l.pid, available - l.qty);
+    }
+    for (const l of pur.lines) await addMove(h, l.pid, -l.qty, 'void-buy', pur.id, now, 'কেনা বাতিল ' + pur.no);
+  }
   const was = pur.status;
   pur.status = 'void'; pur.voidTs = now; pur.voidReason = reason || '';
   (pur.hist = pur.hist || []).push({ ts: now, act: replaced ? 'সংশোধন' : 'বাতিল', info: reason || '' });
@@ -1296,11 +1306,22 @@ async function takeSnapshot(label) {
 }
 async function listSnapshots() { return (await run(['snapshots'], 'readonly', h => h.all('snapshots'))).sort((a, b) => b.ts - a.ts); }
 async function restoreData(backup, label) {
-  if (!backup || backup.app !== APP_ID || !backup.data) throw new Error('এটা এই অ্যাপের ব্যাকআপ ফাইল নয়');
-  await takeSnapshot(label || 'পুনরুদ্ধারের আগের অবস্থা');
   const names = STORE_NAMES.filter(n => n !== 'snapshots');
-  await run(names, 'readwrite', async h => {
-    for (const n of names) { await h.clear(n); for (const o of (backup.data[n] || [])) await h.put(n, o); }
+  if (!backup || backup.app !== APP_ID || !backup.data || typeof backup.data !== 'object' || Array.isArray(backup.data)) throw new Error('এটা এই অ্যাপের ব্যাকআপ ফাইল নয়');
+  for (const n of names) {
+    const rows = backup.data[n];
+    if (!Array.isArray(rows)) throw new Error('ব্যাকআপ অসম্পূর্ণ: "' + n + '" তালিকা পাওয়া যায়নি। বর্তমান ডেটা অপরিবর্তিত আছে।');
+    const key = n === 'meta' ? 'k' : 'id', seen = new Set();
+    for (const row of rows) {
+      if (!row || typeof row !== 'object' || Array.isArray(row) || row[key] == null || String(row[key]) === '') throw new Error('ব্যাকআপে "' + n + '" তালিকার একটি রেকর্ড ত্রুটিপূর্ণ। বর্তমান ডেটা অপরিবর্তিত আছে।');
+      const id = String(row[key]);
+      if (seen.has(id)) throw new Error('ব্যাকআপে "' + n + '" তালিকায় একই পরিচয় একাধিকবার আছে। বর্তমান ডেটা অপরিবর্তিত আছে।');
+      seen.add(id);
+    }
+  }
+  await takeSnapshot(label || 'পুনরুদ্ধারের আগের অবস্থা');
+  await run(names.concat(['audit']), 'readwrite', async h => {
+    for (const n of names) { await h.clear(n); for (const o of backup.data[n]) await h.put(n, o); }
     await audit(h, 'ব্যাকআপ থেকে পুনরুদ্ধার', '', fmtDT(backup.exportedAt));
   });
   await loadCache();
@@ -1539,15 +1560,26 @@ async function parseXlsx(buf) {
 }
 function parseCSV(text) {
   if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
-  const rows = []; let row = [], cur = '', q = false;
+  const rows = []; let row = [], cur = '', q = false, closed = false;
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
-    if (q) { if (ch === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
-    else if (ch === '"') q = true;
-    else if (ch === ',') { row.push(cur); cur = ''; }
-    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cur); cur = ''; if (row.some(x => x !== '')) rows.push(row); row = []; }
-    else cur += ch;
+    if (q) {
+      if (ch === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else { q = false; closed = true; } }
+      else cur += ch;
+    } else if (ch === '"') {
+      if (cur !== '' || closed) throw new Error('CSV ফাইলে উদ্ধৃতি চিহ্নের অবস্থান ভুল (সারি ' + (rows.length + 1) + ')');
+      q = true;
+    } else if (ch === ',') { row.push(cur); cur = ''; closed = false; }
+    else if (ch === '\n' || ch === '\r') {
+      if (ch === '\r' && text[i + 1] === '\n') i++;
+      row.push(cur); cur = ''; closed = false;
+      if (row.some(x => x !== '')) rows.push(row); row = [];
+    } else {
+      if (closed && !/\s/.test(ch)) throw new Error('CSV ফাইলে উদ্ধৃতির পরে অতিরিক্ত লেখা আছে (সারি ' + (rows.length + 1) + ')');
+      if (!closed) cur += ch;
+    }
   }
+  if (q) throw new Error('CSV ফাইলের উদ্ধৃতি চিহ্ন বন্ধ হয়নি (সারি ' + (rows.length + 1) + ')');
   row.push(cur); if (row.some(x => x !== '')) rows.push(row);
   return rows;
 }
